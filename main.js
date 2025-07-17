@@ -1,8 +1,8 @@
-// 2D Space Shooter using Three.js
+// 2D Space Shooter using Three.js - Mobile Compatible
 
 // --- Game Constants ---
-const GAME_WIDTH = 480;
-const GAME_HEIGHT = 720;
+let GAME_WIDTH = window.innerWidth;
+let GAME_HEIGHT = window.innerHeight;
 const PLAYER_SPEED = 8;
 const BULLET_SPEED = 12;
 const ENEMY_SPEED = 2;
@@ -10,20 +10,99 @@ const ENEMY_SPAWN_INTERVAL = 60; // frames
 
 // --- Three.js Setup ---
 const scene = new THREE.Scene();
-const camera = new THREE.OrthographicCamera(
-  GAME_WIDTH / -2, GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_HEIGHT / -2, 0.1, 1000
-);
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(GAME_WIDTH, GAME_HEIGHT);
-document.body.appendChild(renderer.domElement);
+let camera, renderer;
 
 // --- Game State ---
 let player, bullets = [], enemies = [], score = 0, gameOver = false;
 let frameCount = 0;
+let isMobile = window.innerWidth <= 768;
 
 // --- UI Elements ---
 const scoreDiv = document.getElementById('score');
 const gameOverDiv = document.getElementById('gameOver');
+const leftBtn = document.getElementById('leftBtn');
+const rightBtn = document.getElementById('rightBtn');
+const shootBtn = document.getElementById('shootBtn');
+
+// --- Input Handling ---
+const keys = {};
+const touchControls = {
+  left: false,
+  right: false,
+  shoot: false
+};
+
+// Keyboard events
+document.addEventListener('keydown', (e) => { 
+  keys[e.code] = true; 
+  e.preventDefault();
+});
+document.addEventListener('keyup', (e) => { 
+  keys[e.code] = false; 
+  e.preventDefault();
+});
+
+// Touch events for mobile controls
+function setupTouchControls() {
+  if (!isMobile) return;
+  
+  // Left button
+  leftBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    touchControls.left = true;
+  });
+  leftBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    touchControls.left = false;
+  });
+  
+  // Right button
+  rightBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    touchControls.right = true;
+  });
+  rightBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    touchControls.right = false;
+  });
+  
+  // Shoot button
+  shootBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    touchControls.shoot = true;
+  });
+  shootBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    touchControls.shoot = false;
+  });
+  
+  // Prevent context menu on long press
+  [leftBtn, rightBtn, shootBtn].forEach(btn => {
+    btn.addEventListener('contextmenu', (e) => e.preventDefault());
+  });
+}
+
+// --- Responsive Setup ---
+function setupResponsive() {
+  GAME_WIDTH = window.innerWidth;
+  GAME_HEIGHT = window.innerHeight;
+  isMobile = GAME_WIDTH <= 768;
+  
+  // Update camera
+  camera.left = GAME_WIDTH / -2;
+  camera.right = GAME_WIDTH / 2;
+  camera.top = GAME_HEIGHT / 2;
+  camera.bottom = GAME_HEIGHT / -2;
+  camera.updateProjectionMatrix();
+  
+  // Update renderer
+  renderer.setSize(GAME_WIDTH, GAME_HEIGHT);
+  
+  // Update player position if exists
+  if (player) {
+    player.position.y = -GAME_HEIGHT / 2 + 40;
+  }
+}
 
 // --- Player Setup ---
 function createPlayer() {
@@ -56,19 +135,17 @@ function createEnemy() {
   return mesh;
 }
 
-// --- Input Handling ---
-const keys = {};
-document.addEventListener('keydown', (e) => { keys[e.code] = true; });
-document.addEventListener('keyup', (e) => { keys[e.code] = false; });
-
 // --- Shooting ---
 let canShoot = true;
 function handleShooting() {
-  if ((keys['Space'] || keys['ArrowUp']) && canShoot && !gameOver) {
+  const shouldShoot = (keys['Space'] || keys['ArrowUp'] || touchControls.shoot) && canShoot && !gameOver;
+  
+  if (shouldShoot) {
     bullets.push(createBullet(player.position.x, player.position.y));
     canShoot = false;
   }
-  if (!keys['Space'] && !keys['ArrowUp']) {
+  
+  if (!keys['Space'] && !keys['ArrowUp'] && !touchControls.shoot) {
     canShoot = true;
   }
 }
@@ -92,10 +169,13 @@ function animate() {
   frameCount++;
 
   // Player movement
-  if (keys['ArrowLeft'] || keys['KeyA']) {
+  const moveLeft = keys['ArrowLeft'] || keys['KeyA'] || touchControls.left;
+  const moveRight = keys['ArrowRight'] || keys['KeyD'] || touchControls.right;
+  
+  if (moveLeft) {
     player.position.x = Math.max(player.position.x - PLAYER_SPEED, -GAME_WIDTH / 2 + 20);
   }
-  if (keys['ArrowRight'] || keys['KeyD']) {
+  if (moveRight) {
     player.position.x = Math.min(player.position.x + PLAYER_SPEED, GAME_WIDTH / 2 - 20);
   }
 
@@ -155,9 +235,33 @@ function endGame() {
 
 // --- Init ---
 function init() {
+  // Setup Three.js
+  camera = new THREE.OrthographicCamera(
+    GAME_WIDTH / -2, GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_HEIGHT / -2, 0.1, 1000
+  );
   camera.position.z = 10;
+  
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(GAME_WIDTH, GAME_HEIGHT);
+  renderer.setClearColor(0x000000);
+  document.getElementById('gameContainer').appendChild(renderer.domElement);
+  
+  // Setup touch controls
+  setupTouchControls();
+  
+  // Setup responsive handling
+  window.addEventListener('resize', setupResponsive);
+  window.addEventListener('orientationchange', () => {
+    setTimeout(setupResponsive, 100);
+  });
+  
+  // Create player and start game
   player = createPlayer();
   animate();
 }
+
+// Prevent default touch behaviors
+document.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+document.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
 init(); 
