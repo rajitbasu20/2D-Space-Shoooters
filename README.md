@@ -11,7 +11,7 @@ A classic 2D space shooter game built with Three.js.
 
 ## 🚀 Live Demo
 
-Play the game: [2D Space Shooter](https://YOUR_USERNAME.github.io/2d-space-shooter)
+Play the game: [2D Space Shooter](https://rajitbasu20.github.io/2d-space-shooter)
 
 ## 🛠️ Local Development
 
