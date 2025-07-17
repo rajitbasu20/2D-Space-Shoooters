@@ -2,17 +2,167 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>2D Space Shooter - Three.js</title>
   <style>
-    body { margin: 0; overflow: hidden; background: #000; }
-    #score { position: absolute; top: 10px; left: 10px; color: #fff; font-size: 24px; z-index: 1; }
-    #gameOver { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 48px; z-index: 2; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      margin: 0; 
+      overflow: hidden; 
+      background: #000;
+      font-family: Arial, sans-serif;
+      touch-action: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    
+    #gameContainer {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    #score { 
+      position: absolute; 
+      top: 10px; 
+      left: 10px; 
+      color: #fff; 
+      font-size: 24px; 
+      z-index: 10;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+    
+    #gameOver { 
+      display: none; 
+      position: absolute; 
+      top: 50%; 
+      left: 50%; 
+      transform: translate(-50%, -50%); 
+      color: #fff; 
+      font-size: 48px; 
+      z-index: 20;
+      text-align: center;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+    
+    #gameOver button {
+      margin-top: 20px;
+      padding: 15px 30px;
+      font-size: 24px;
+      background: #00fffc;
+      border: none;
+      border-radius: 10px;
+      color: #000;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    
+    #gameOver button:hover {
+      background: #00ccca;
+    }
+    
+    #mobileControls {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 10;
+    }
+    
+    .controlBtn {
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.1s ease;
+    }
+    
+    .controlBtn:active {
+      background: rgba(255, 255, 255, 0.4);
+      transform: scale(0.95);
+    }
+    
+    .controlBtn.left {
+      background: rgba(0, 255, 252, 0.3);
+      border-color: rgba(0, 255, 252, 0.7);
+    }
+    
+    .controlBtn.right {
+      background: rgba(0, 255, 252, 0.3);
+      border-color: rgba(0, 255, 252, 0.7);
+    }
+    
+    .controlBtn.shoot {
+      background: rgba(255, 255, 0, 0.3);
+      border-color: rgba(255, 255, 0, 0.7);
+    }
+    
+    /* Hide mobile controls on desktop */
+    @media (min-width: 768px) {
+      #mobileControls {
+        display: none;
+      }
+    }
+    
+    /* Mobile-specific adjustments */
+    @media (max-width: 767px) {
+      #score {
+        font-size: 20px;
+        top: 5px;
+        left: 5px;
+      }
+      
+      #gameOver {
+        font-size: 36px;
+      }
+      
+      #gameOver button {
+        font-size: 20px;
+        padding: 12px 24px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div id="score">Score: 0</div>
-  <div id="gameOver">Game Over<br><button onclick="location.reload()">Restart</button></div>
+  <div id="gameContainer">
+    <div id="score">Score: 0</div>
+    <div id="gameOver">
+      Game Over<br>
+      <button onclick="location.reload()">Restart</button>
+    </div>
+    <div id="mobileControls">
+      <div class="controlBtn left" id="leftBtn">←</div>
+      <div class="controlBtn shoot" id="shootBtn">🔥</div>
+      <div class="controlBtn right" id="rightBtn">→</div>
+    </div>
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
   <script src="main.js"></script>
 </body>
