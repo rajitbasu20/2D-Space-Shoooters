@@ -4,8 +4,13 @@ A classic 2D space shooter game built with Three.js.
 
 ## 🎮 How to Play
 
+### Desktop Controls:
 - **Move**: Use Arrow Keys (Left/Right) or A/D keys
 - **Shoot**: Press Spacebar or Up Arrow
+
+### Mobile Controls:
+- **Move**: Tap the left/right arrow buttons
+- **Shoot**: Tap the fire button (🔥)
 - **Goal**: Destroy enemy ships and survive as long as possible
 - **Game Over**: When an enemy ship collides with your ship
 
@@ -33,7 +38,9 @@ python -m http.server 8000
 - Real-time collision detection
 - Score tracking
 - Game over screen with restart option
-- Responsive controls
+- **Mobile-friendly touch controls**
+- **Responsive design for all screen sizes**
+- **Cross-platform compatibility (desktop & mobile)**
 
 ## 📁 Project Structure
 
